@@ -17,9 +17,9 @@ const Listings = () => {
   const [popupType, setPopupType] = useState("");
   const [inputs, setInputs] = useState({});
   const [imageIndex, setImageIndex] = useState(0);
+  const [showFraudAlert, setShowFraudAlert] = useState(true);
 
   useEffect(() => {
-    // Simulate API fetch
     const fetchData = async () => {
       const data = [
         {
@@ -116,10 +116,31 @@ const Listings = () => {
         Featured Property
       </h1>
 
+      {/* Fraud Alert Modal */}
+      {showFraudAlert && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white text-black rounded-xl p-6 w-11/12 max-w-md shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-red-600 text-2xl">⚠️</div>
+              <h2 className="text-xl font-bold">Beware of Fraud</h2>
+            </div>
+            <p className="text-sm mb-4">
+              Always be on the lookout for scams and fake listings. Avoid deals
+              that seem too good to be true or ask for up-front payment.
+            </p>
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+              onClick={() => setShowFraudAlert(false)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Card */}
       {listings.length > 0 && (
         <div className="relative w-full max-w-xl h-[600px] bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e]">
-          {/* Header */}
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-xl text-pink-200 font-semibold">
@@ -143,7 +164,6 @@ const Listings = () => {
             </div>
           </div>
 
-          {/* Image Slider */}
           <div className="relative mt-4">
             <img
               src={listings[currentIndex].images[imageIndex]}
@@ -174,7 +194,6 @@ const Listings = () => {
             </button>
           </div>
 
-          {/* Details */}
           <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
             <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
               <FaHome /> {listings[currentIndex].bhk}
@@ -194,7 +213,6 @@ const Listings = () => {
             )}
           </div>
 
-          {/* Buttons */}
           <div className="flex justify-between items-center mt-6">
             <div className="flex gap-2">
               <button
@@ -236,7 +254,6 @@ const Listings = () => {
         </div>
       )}
 
-      {/* Dot Navigation */}
       <div className="flex justify-center gap-2 mt-6">
         {listings.map((_, i) => (
           <button
@@ -252,7 +269,6 @@ const Listings = () => {
         ))}
       </div>
 
-      {/* Popup Modal */}
       {activePopup && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/60 flex items-center justify-center z-50">
           <div className="bg-[#220033] p-6 rounded-xl w-11/12 max-w-md">
