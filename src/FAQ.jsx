@@ -1,99 +1,111 @@
 import React, { useState } from "react";
-import { FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
-import { motion } from "framer-motion";
 
 const faqs = [
   {
-    question: "What documents do I need to rent a house?",
+    question: "What is your refund policy?",
     answer:
-      "Typically, you need ID proof, income verification, and a rental application.",
+      "We offer a full refund within the first 7 days of purchase. No questions asked.",
   },
   {
-    question: "Can I schedule a virtual house tour?",
-    answer: "Yes! Many properties offer virtual tours for your convenience.",
-  },
-  {
-    question: "Are utilities included in rent?",
-    answer: "It depends on the property. Always check with the landlord.",
-  },
-  {
-    question: "How do I report a maintenance issue?",
+    question: "How can I contact customer support?",
     answer:
-      "Contact your property manager or use the online maintenance portal.",
+      "You can reach our support team via email at support@nearbyrooms.com or through the chat widget on our website.",
   },
   {
-    question: "Is a credit check required for renting?",
+    question: "Do you offer customization options?",
     answer:
-      "Yes, most landlords require a credit check to assess financial reliability.",
+      "Yes, we offer multiple customization options based on user requirements. Contact us for more details.",
+  },
+  {
+    question: "Is there a free trial available?",
+    answer:
+      "Yes! We offer a 14-day free trial on selected plans. No credit card required.",
   },
 ];
 
-export default function App() {
-  const [openIndex, setOpenIndex] = useState(null);
+const FAQ = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
+    setActiveIndex(index === activeIndex ? null : index);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-800 to-indigo-900 text-white flex flex-col items-center p-6">
-      {/* Header */}
-      <h1 className="text-5xl font-bold mb-2">FAQ</h1>
-      <img
-        src="/faq.png"
-        alt="FAQ Mascot"
-        className="w-28 h-28 rounded-full shadow-xl mb-2"
-      />
-      <p className="text-lg text-center max-w-xl mb-10">
-        Everything you need to know before renting or buying a new place.
-        <br />
-        Click a question to see more!
-      </p>
+    <div className="min-h-screen bg-gradient-to-b from-[#1a002c] via-[#25003d] to-[#0e001b] text-white font-sans">
+      {/* Part 1: Header */}
+      <header className="text-center py-16">
+        <h1 className="text-5xl font-bold text-purple-300">
+          Frequently Asked Questions
+        </h1>
+        <p className="text-lg mt-4 text-purple-200">
+          Find answers to your most common questions below.
+        </p>
+      </header>
 
-      {/* FAQ Section */}
-      <div className="w-full max-w-2xl space-y-4">
-        {faqs.map((faq, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-purple-600 rounded-xl shadow-md overflow-hidden"
-          >
-            <button
-              onClick={() => toggleFAQ(index)}
-              className="w-full text-left px-6 py-4 font-semibold text-lg hover:bg-purple-700 focus:outline-none"
+      {/* Part 2: FAQ Section */}
+      <section className="px-4 md:px-16 mb-16">
+        <div className="max-w-4xl mx-auto bg-[#1b002c] p-8 rounded-3xl shadow-2xl space-y-4">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="bg-[#32054f] rounded-xl overflow-hidden transition-all"
             >
-              {faq.question}
-            </button>
-            {openIndex === index && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="px-6 pb-4 text-gray-100"
+              <button
+                onClick={() => toggleFAQ(index)}
+                className="w-full text-left px-6 py-4 flex justify-between items-center text-purple-100 font-semibold"
               >
-                {faq.answer}
-              </motion.div>
-            )}
-          </motion.div>
-        ))}
-      </div>
+                {faq.question}
+                <span className="text-pink-300 text-xl">
+                  {activeIndex === index ? "−" : "+"}
+                </span>
+              </button>
+              {activeIndex === index && (
+                <div className="px-6 pb-4 text-purple-200">{faq.answer}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="mt-16 text-center text-sm text-gray-300 space-y-3">
-        <div className="flex justify-center space-x-5 text-xl mb-1">
-          <a href="https://linkedin.com" target="_blank" rel="noreferrer">
-            <FaLinkedin className="hover:text-white" />
+      {/* Part 3: Newsletter */}
+      <section className="text-center mb-16">
+        <h2 className="text-3xl font-bold text-purple-300 mb-4">
+          Get Updated News
+        </h2>
+        <p className="text-purple-200 mb-4">
+          Subscribe to our newsletter for updates
+        </p>
+        <div className="flex justify-center">
+          <input
+            type="email"
+            placeholder="Your Email"
+            className="p-3 rounded-l bg-[#32054f] text-white w-64"
+          />
+          <button className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 rounded-r">
+            ➤
+          </button>
+        </div>
+      </section>
+
+      {/* Part 4: Footer */}
+      <footer className="bg-[#140022] py-8 text-center text-sm text-purple-400">
+        <div className="mb-4">
+          <p>© 2025 Nearby Rooms. All rights reserved.</p>
+        </div>
+        <div className="flex justify-center gap-4 text-lg">
+          <a href="#" className="hover:text-white">
+            LinkedIn
           </a>
-          <a href="https://twitter.com" target="_blank" rel="noreferrer">
-            <FaTwitter className="hover:text-white" />
+          <a href="#" className="hover:text-white">
+            Facebook
           </a>
-          <a href="https://facebook.com" target="_blank" rel="noreferrer">
-            <FaFacebook className="hover:text-white" />
+          <a href="#" className="hover:text-white">
+            Twitter
           </a>
         </div>
-        <p>© 2025 Nearby Rooms. All rights reserved.</p>
       </footer>
     </div>
   );
-}
+};
+
+export default FAQ;
