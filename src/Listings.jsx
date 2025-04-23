@@ -8,95 +8,95 @@ import {
   FaCouch,
   FaSnowflake,
   FaTree,
-  FaChevronLeft,
-  FaChevronRight,
 } from "react-icons/fa";
 
 const Listings = () => {
   const [listings, setListings] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [imageIndex, setImageIndex] = useState(0);
   const [activePopup, setActivePopup] = useState(null);
   const [popupType, setPopupType] = useState("");
   const [inputs, setInputs] = useState({});
   const [showFraudAlert, setShowFraudAlert] = useState(true);
+  const [imageIndexes, setImageIndexes] = useState({});
 
   useEffect(() => {
-    const data = [
-      {
-        id: 1,
-        name: "Oberoi Sky",
-        city: "Mumbai",
-        location: "Borivali",
-        mapLink: "https://maps.google.com?q=Borivali,Mumbai",
-        rent: "₹13,000/month",
-        bhk: "2 BHK",
-        furnishing: "Furnished",
-        ac: true,
-        terrace: true,
-        images: [
-          "/Living_Room.jpg",
-          "/Kitchen.jpg",
-          "/Bedroom.jpg",
-          "/Bathroom.jpg",
-        ],
-      },
-      {
-        id: 2,
-        name: "Shweta Heights",
-        city: "Nashik",
-        location: "Pragati Nagar",
-        mapLink: "https://maps.google.com?q=Pragati+Nagar,Nashik",
-        rent: "₹10,500/month",
-        bhk: "1 BHK",
-        furnishing: "Semi-Furnished",
-        ac: true,
-        terrace: false,
-        images: [
-          "/Living_Room2.jpg",
-          "/Kitchen2.jpg",
-          "/Bedroom2.jpg",
-          "/Bathroom2.jpg",
-        ],
-      },
-      {
-        id: 3,
-        name: "Ashish Complex",
-        city: "Nagpur",
-        location: "Hingna",
-        mapLink: "https://maps.google.com?q=Hingna,Nagpur",
-        rent: "₹15,000/month",
-        bhk: "3 BHK",
-        furnishing: "Furnished",
-        ac: false,
-        terrace: true,
-        images: [
-          "/Living_Room3.jpg",
-          "/Kitchen3.jpg",
-          "/Bedroom3.jpg",
-          "/Bathroom3.jpg",
-        ],
-      },
-      {
-        id: 4,
-        name: "Kalpavruksh",
-        city: "Pune",
-        location: "Viman Nagar",
-        mapLink: "https://maps.google.com?q=Viman+Nagar,Pune",
-        rent: "₹12,500/month",
-        bhk: "2 BHK",
-        furnishing: "Semi-Furnished",
-        ac: true,
-        terrace: false,
-        images: [
-          "/Living_Room4.jpg",
-          "/Kitchen4.jpg",
-          "/Bedroom4.jpg",
-          "/Bathroom3.jpg",
-        ],
-      },
-    ];
-    setListings(data);
+    const fetchData = async () => {
+      const data = [
+        {
+          id: 1,
+          name: "Oberoi Sky",
+          city: "Mumbai",
+          location: "Borivali",
+          mapLink: "https://maps.google.com?q=Borivali,Mumbai",
+          rent: "₹13,000/month",
+          bhk: "2 BHK",
+          furnishing: "Furnished",
+          ac: true,
+          terrace: true,
+          images: [
+            "/Living_Room.jpg",
+            "/Kitchen.jpg",
+            "/Bedroom.jpg",
+            "/Bathroom.jpg",
+          ],
+        },
+        {
+          id: 2,
+          name: "Shweta Heights",
+          city: "Nashik",
+          location: "Pragati Nagar",
+          mapLink: "https://maps.google.com?q=Pragati+Nagar,Nashik",
+          rent: "₹10,500/month",
+          bhk: "1 BHK",
+          furnishing: "Semi-Furnished",
+          ac: true,
+          terrace: false,
+          images: [
+            "/Living_Room2.jpg",
+            "/Kitchen2.jpg",
+            "/Bedroom2.jpg",
+            "/Bathroom2.jpg",
+          ],
+        },
+        {
+          id: 3,
+          name: "Ashish Complex",
+          city: "Nagpur",
+          location: "Hingna",
+          mapLink: "https://maps.google.com?q=Hingna,Nagpur",
+          rent: "₹15,000/month",
+          bhk: "3 BHK",
+          furnishing: "Furnished",
+          ac: false,
+          terrace: true,
+          images: [
+            "/Living_Room3.jpg",
+            "/Kitchen3.jpg",
+            "/Bedroom3.jpg",
+            "/Bathroom3.jpg",
+          ],
+        },
+        {
+          id: 4,
+          name: "Kalpavruksh",
+          city: "Pune",
+          location: "Viman Nagar",
+          mapLink: "https://maps.google.com?q=Viman+Nagar,Pune",
+          rent: "₹12,500/month",
+          bhk: "2 BHK",
+          furnishing: "Semi-Furnished",
+          ac: true,
+          terrace: false,
+          images: [
+            "/Living_Room4.jpg",
+            "/Kitchen4.jpg",
+            "/Bedroom4.jpg",
+            "/Bathroom3.jpg",
+          ],
+        },
+      ];
+      setListings(data);
+    };
+    fetchData();
   }, []);
 
   const handleSend = () => {
@@ -109,7 +109,12 @@ const Listings = () => {
     setInputs({ ...inputs, [activePopup]: "" });
   };
 
-  const listing = listings[activeIndex];
+  const handleImageChange = (index, direction, max) => {
+    setImageIndexes((prev) => ({
+      ...prev,
+      [index]: (prev[index] ?? 0 + direction + max) % max,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0020] via-[#1a0033] to-[#0f0020] text-white p-4">
@@ -138,9 +143,12 @@ const Listings = () => {
         </div>
       )}
 
-      {listing && (
-        <div className="flex justify-center items-center relative">
-          <div className="relative bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e] max-w-xl w-full">
+      <div className="space-y-12 pb-6">
+        {listings.map((listing, index) => (
+          <div
+            key={listing.id}
+            className="relative bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e] max-w-xl mx-auto"
+          >
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-xl text-pink-200 font-semibold">
@@ -163,31 +171,27 @@ const Listings = () => {
               </div>
             </div>
 
-            {/* Image swipe with arrows */}
             <div className="relative mt-4">
               <img
-                src={listing.images[imageIndex]}
+                src={listing.images[imageIndexes[index] ?? 0]}
                 alt="property"
                 className="w-full h-56 object-cover rounded-lg"
               />
               <button
                 onClick={() =>
-                  setImageIndex(
-                    (prev) =>
-                      (prev - 1 + listing.images.length) % listing.images.length
-                  )
+                  handleImageChange(index, -1, listing.images.length)
                 }
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded-full"
+                className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
               >
-                <FaChevronLeft />
+                ‹
               </button>
               <button
                 onClick={() =>
-                  setImageIndex((prev) => (prev + 1) % listing.images.length)
+                  handleImageChange(index, 1, listing.images.length)
                 }
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded-full"
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
               >
-                <FaChevronRight />
+                ›
               </button>
             </div>
 
@@ -215,7 +219,7 @@ const Listings = () => {
                 <button
                   onClick={() => {
                     setPopupType("message");
-                    setActivePopup(activeIndex);
+                    setActivePopup(index);
                   }}
                   className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
                 >
@@ -224,7 +228,7 @@ const Listings = () => {
                 <button
                   onClick={() => {
                     setPopupType("contact");
-                    setActivePopup(activeIndex);
+                    setActivePopup(index);
                   }}
                   className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
                 >
@@ -249,24 +253,8 @@ const Listings = () => {
               </div>
             </div>
           </div>
-
-          {/* Listing dot swipe (outside right) */}
-          <div className="flex flex-col justify-center items-center ml-4 absolute right-[-2rem] top-1/2 transform -translate-y-1/2">
-            {listings.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setActiveIndex(i);
-                  setImageIndex(0); // Reset image index when switching listing
-                }}
-                className={`w-3 h-3 mb-2 rounded-full transition-all ${
-                  i === activeIndex ? "bg-yellow-400 scale-125" : "bg-white/30"
-                }`}
-              ></button>
-            ))}
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
 
       {activePopup !== null && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/60 flex items-center justify-center z-50">
@@ -275,7 +263,7 @@ const Listings = () => {
               {popupType === "message" ? "Send a Message" : "Contact the Owner"}
             </h3>
             <textarea
-              rows={4}
+              rows="4"
               className="w-full p-2 rounded bg-white/10 text-white"
               placeholder={
                 popupType === "message"
