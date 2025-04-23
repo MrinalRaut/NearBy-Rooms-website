@@ -19,84 +19,85 @@ const Listings = () => {
   const [imageIndexes, setImageIndexes] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = [
-        {
-          id: 1,
-          name: "Oberoi Sky",
-          city: "Mumbai",
-          location: "Borivali",
-          mapLink: "https://maps.google.com?q=Borivali,Mumbai",
-          rent: "₹13,000/month",
-          bhk: "2 BHK",
-          furnishing: "Furnished",
-          ac: true,
-          terrace: true,
-          images: [
-            "/Living_Room.jpg",
-            "/Kitchen.jpg",
-            "/Bedroom.jpg",
-            "/Bathroom.jpg",
-          ],
-        },
-        {
-          id: 2,
-          name: "Shweta Heights",
-          city: "Nashik",
-          location: "Pragati Nagar",
-          mapLink: "https://maps.google.com?q=Pragati+Nagar,Nashik",
-          rent: "₹10,500/month",
-          bhk: "1 BHK",
-          furnishing: "Semi-Furnished",
-          ac: true,
-          terrace: false,
-          images: [
-            "/Living_Room2.jpg",
-            "/Kitchen2.jpg",
-            "/Bedroom2.jpg",
-            "/Bathroom2.jpg",
-          ],
-        },
-        {
-          id: 3,
-          name: "Ashish Complex",
-          city: "Nagpur",
-          location: "Hingna",
-          mapLink: "https://maps.google.com?q=Hingna,Nagpur",
-          rent: "₹15,000/month",
-          bhk: "3 BHK",
-          furnishing: "Furnished",
-          ac: false,
-          terrace: true,
-          images: [
-            "/Living_Room3.jpg",
-            "/Kitchen3.jpg",
-            "/Bedroom3.jpg",
-            "/Bathroom3.jpg",
-          ],
-        },
-        {
-          id: 4,
-          name: "Kalpavruksh",
-          city: "Pune",
-          location: "Viman Nagar",
-          mapLink: "https://maps.google.com?q=Viman+Nagar,Pune",
-          rent: "₹12,500/month",
-          bhk: "2 BHK",
-          furnishing: "Semi-Furnished",
-          ac: true,
-          terrace: false,
-          images: [
-            "/Living_Room4.jpg",
-            "/Kitchen4.jpg",
-            "/Bedroom4.jpg",
-            "/Bathroom3.jpg",
-          ],
-        },
-      ];
-      setListings(data);
-    };
-    fetchData();
+    const data = [
+      {
+        id: 1,
+        name: "Oberoi Sky",
+        city: "Mumbai",
+        location: "Borivali",
+        mapLink: "https://maps.google.com?q=Borivali,Mumbai",
+        rent: "₹13,000/month",
+        bhk: "2 BHK",
+        furnishing: "Furnished",
+        ac: true,
+        terrace: true,
+        images: [
+          "/Living_Room.jpg",
+          "/Kitchen.jpg",
+          "/Bedroom.jpg",
+          "/Bedroom4.jpg",
+          "/Bathroom.jpg",
+        ],
+      },
+      {
+        id: 2,
+        name: "Shweta Heights",
+        city: "Nashik",
+        location: "Pragati Nagar",
+        mapLink: "https://maps.google.com?q=Pragati+Nagar,Nashik",
+        rent: "₹10,500/month",
+        bhk: "1 BHK",
+        furnishing: "Semi-Furnished",
+        ac: true,
+        terrace: false,
+        images: [
+          "/Living_Room2.jpg",
+          "/Kitchen2.jpg",
+          "/Bedroom2.jpg",
+          "/Bathroom2.jpg",
+        ],
+      },
+      {
+        id: 3,
+        name: "Ashish Complex",
+        city: "Nagpur",
+        location: "Hingna",
+        mapLink: "https://maps.google.com?q=Hingna,Nagpur",
+        rent: "₹15,000/month",
+        bhk: "3 BHK",
+        furnishing: "Furnished",
+        ac: false,
+        terrace: true,
+        images: [
+          "/Living_Room3.jpg",
+          "/Kitchen3.jpg",
+          "/Bedroom3.jpg",
+          "/Bedroom.jpg",
+          "/Bedroom4.jpg",
+          "/Bathroom3.jpg",
+        ],
+      },
+      {
+        id: 4,
+        name: "Kalpavruksh",
+        city: "Pune",
+        location: "Viman Nagar",
+        mapLink: "https://maps.google.com?q=Viman+Nagar,Pune",
+        rent: "₹12,500/month",
+        bhk: "2 BHK",
+        furnishing: "Semi-Furnished",
+        ac: true,
+        terrace: false,
+        images: [
+          "/Living_Room4.jpg",
+          "/Kitchen4.jpg",
+          "/Bedroom4.jpg",
+          "/Bedroom2.jpg",
+          "/Bathroom3.jpg",
+        ],
+      },
+    ];
+    setListings(data);
   }, []);
 
   const handleSend = () => {
@@ -110,14 +111,15 @@ const Listings = () => {
   };
 
   const handleImageChange = (index, direction, max) => {
-    setImageIndexes((prev) => ({
-      ...prev,
-      [index]: (prev[index] ?? 0 + direction + max) % max,
-    }));
+    setImageIndexes((prev) => {
+      const current = prev[index] ?? 0;
+      const nextIndex = (current + direction + max) % max;
+      return { ...prev, [index]: nextIndex };
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0020] via-[#1a0033] to-[#0f0020] text-white p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f0020] via-[#1a0033] to-[#0f0020] text-white p-4 overflow-y-auto">
       <h1 className="text-3xl font-bold text-yellow-400 text-center mb-6">
         Featured Properties
       </h1>
@@ -263,7 +265,7 @@ const Listings = () => {
               {popupType === "message" ? "Send a Message" : "Contact the Owner"}
             </h3>
             <textarea
-              rows="4"
+              rows={4}
               className="w-full p-2 rounded bg-white/10 text-white"
               placeholder={
                 popupType === "message"
