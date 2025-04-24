@@ -1,4 +1,4 @@
-// src/components/Listings.tsx
+// src/components/Listings.jsx
 import React, { useState, useEffect } from "react";
 import {
   FaWhatsapp,
@@ -12,11 +12,18 @@ import {
 
 const Listings = () => {
   const [listings, setListings] = useState([]);
+  const [filteredListings, setFilteredListings] = useState([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [activePopup, setActivePopup] = useState(null);
   const [popupType, setPopupType] = useState("");
   const [inputs, setInputs] = useState({});
   const [showFraudAlert, setShowFraudAlert] = useState(true);
   const [imageIndexes, setImageIndexes] = useState({});
+  const [filters, setFilters] = useState({
+    sort: "",
+    city: "",
+    bhk: "",
+  });
 
   useEffect(() => {
     const data = [
@@ -27,6 +34,7 @@ const Listings = () => {
         location: "Borivali",
         mapLink: "https://maps.google.com?q=Borivali,Mumbai",
         rent: "₹13,000/month",
+        rentValue: 13000,
         bhk: "2 BHK",
         furnishing: "Furnished",
         ac: true,
@@ -46,6 +54,7 @@ const Listings = () => {
         location: "Pragati Nagar",
         mapLink: "https://maps.google.com?q=Pragati+Nagar,Nashik",
         rent: "₹10,500/month",
+        rentValue: 10500,
         bhk: "1 BHK",
         furnishing: "Semi-Furnished",
         ac: true,
@@ -64,6 +73,7 @@ const Listings = () => {
         location: "Hingna",
         mapLink: "https://maps.google.com?q=Hingna,Nagpur",
         rent: "₹15,000/month",
+        rentValue: 15000,
         bhk: "3 BHK",
         furnishing: "Furnished",
         ac: false,
@@ -84,6 +94,7 @@ const Listings = () => {
         location: "Viman Nagar",
         mapLink: "https://maps.google.com?q=Viman+Nagar,Pune",
         rent: "₹12,500/month",
+        rentValue: 12500,
         bhk: "2 BHK",
         furnishing: "Semi-Furnished",
         ac: true,
@@ -98,7 +109,28 @@ const Listings = () => {
       },
     ];
     setListings(data);
+    setFilteredListings(data);
   }, []);
+
+  useEffect(() => {
+    let sorted = [...listings];
+
+    if (filters.sort === "Low to High") {
+      sorted.sort((a, b) => a.rentValue - b.rentValue);
+    } else if (filters.sort === "High to Low") {
+      sorted.sort((a, b) => b.rentValue - a.rentValue);
+    }
+
+    if (filters.city) {
+      sorted = sorted.filter((l) => l.city === filters.city);
+    }
+
+    if (filters.bhk) {
+      sorted = sorted.filter((l) => l.bhk === filters.bhk);
+    }
+
+    setFilteredListings(sorted);
+  }, [filters, listings]);
 
   const handleSend = () => {
     alert(
@@ -120,9 +152,18 @@ const Listings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0020] via-[#1a0033] to-[#0f0020] text-white p-4 overflow-y-auto">
-      <h1 className="text-3xl font-bold text-yellow-400 text-center mb-6">
-        Featured Properties
-      </h1>
+      <div className="flex items-center justify-start mb-6">
+        <button
+          className="lg:hidden text-white px-3 py-2 rounded border border-white ml-4"
+          onClick={() => setFiltersOpen(!filtersOpen)}
+        >
+          ☰
+        </button>
+        <h1 className="text-3xl font-bold text-yellow-400 text-center mb-6 flex-1">
+          Featured Properties
+        </h1>
+      </div>
+
 
       {showFraudAlert && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
@@ -145,157 +186,177 @@ const Listings = () => {
         </div>
       )}
 
-      <div className="space-y-12 pb-6">
-        {listings.map((listing, index) => (
-          <div
-            key={listing.id}
-            className="relative bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e] max-w-xl mx-auto"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-xl text-pink-200 font-semibold">
-                  {listing.name}
-                </h2>
-                <p className="text-sm text-pink-100">
-                  <a
-                    href={listing.mapLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-blue-300 mt-1 hover:underline"
-                  >
-                    <FaMapMarkerAlt className="mr-2" />
-                    {listing.location}, {listing.city}
-                  </a>
-                </p>
-              </div>
-              <div className="text-green-400 text-lg font-bold">
-                {listing.rent}
-              </div>
-            </div>
+      <div className="flex">
+      <div className={`w-64 pr-4 ${filtersOpen ? "block" : "hidden"} lg:block`}>
 
-            <div className="relative mt-4">
-              <img
-                src={listing.images[imageIndexes[index] ?? 0]}
-                alt="property"
-                className="w-full h-56 object-cover rounded-lg"
-              />
-              <button
-                onClick={() =>
-                  handleImageChange(index, -1, listing.images.length)
+          <div className="bg-[#2c1a4f] p-6 rounded-2xl border border-[#5c3b91] text-pink-200">
+            <h2 className="text-lg font-semibold mb-4 text-pink-300">Filters</h2>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm text-pink-200">Sort By</label>
+              <select
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, sort: e.target.value }))
                 }
-                className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                className="w-full bg-[#2c1a4f] text-white p-2 rounded border border-[#422c6e] focus:outline-none focus:ring-2 focus:ring-[#5ecbff] focus:border-[#5ecbff]"
               >
-                ‹
-              </button>
-              <button
-                onClick={() =>
-                  handleImageChange(index, 1, listing.images.length)
+
+                <option value="">-- Select --</option>
+                <option>High to Low</option>
+                <option>Low to High</option>
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1 text-sm text-pink-100">City</label>
+              <select
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, city: e.target.value }))
                 }
-                className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                className="w-full bg-[#2c1a4f] text-white p-2 rounded text-white border border-[#422c6e] focus:outline-none focus:ring-2 focus:ring-[#5ecbff] focus:border-[#5ecbff]"
               >
-                ›
-              </button>
+                <option value="">-- Select --</option>
+                <option>Mumbai</option>
+                <option>Pune</option>
+                <option>Nashik</option>
+                <option>Nagpur</option>
+              </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
-              <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                <FaHome /> {listing.bhk}
-              </div>
-              <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                <FaCouch /> {listing.furnishing}
-              </div>
-              {listing.ac && (
-                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                  <FaSnowflake /> AC
-                </div>
-              )}
-              {listing.terrace && (
-                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                  <FaTree /> Terrace
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-between items-center mt-6">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setPopupType("message");
-                    setActivePopup(index);
-                  }}
-                  className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
-                >
-                  Message
-                </button>
-                <button
-                  onClick={() => {
-                    setPopupType("contact");
-                    setActivePopup(index);
-                  }}
-                  className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
-                >
-                  Contact
-                </button>
-              </div>
-              <div className="flex gap-4">
-                <a
-                  href="https://wa.me/1234567890"
-                  target="_blank"
-                  className="bg-green-500 p-3 rounded-full"
-                >
-                  <FaWhatsapp />
-                </a>
-                <a
-                  href="https://t.me/yourtelegramusername"
-                  target="_blank"
-                  className="bg-blue-500 p-3 rounded-full"
-                >
-                  <FaTelegram />
-                </a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {activePopup !== null && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#220033] p-6 rounded-xl w-11/12 max-w-md">
-            <h3 className="text-xl mb-4 text-white">
-              {popupType === "message" ? "Send a Message" : "Contact the Owner"}
-            </h3>
-            <textarea
-              rows={4}
-              className="w-full p-2 rounded bg-white/10 text-white"
-              placeholder={
-                popupType === "message"
-                  ? "Type your message..."
-                  : "Enter your contact info..."
-              }
-              value={inputs[activePopup] || ""}
-              onChange={(e) =>
-                setInputs({ ...inputs, [activePopup]: e.target.value })
-              }
-            ></textarea>
-            <div className="flex justify-end mt-4 gap-2">
-              <button
-                onClick={() => setActivePopup(null)}
-                className="bg-red-500 text-white py-2 px-4 rounded"
+            <div>
+              <label className="block mb-1 text-sm text-pink-100">BHK</label>
+              <select
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, bhk: e.target.value }))
+                }
+                className="w-full bg-[#2c1a4f] text-white p-2 rounded text-white border border-[#422c6e] focus:outline-none focus:ring-2 focus:ring-[#5ecbff] focus:border-[#5ecbff]"
               >
-                Close
-              </button>
-              <button
-                onClick={handleSend}
-                className="bg-green-500 text-white py-2 px-4 rounded"
-              >
-                Send
-              </button>
+                <option value="">-- Select --</option>
+                <option>1 BHK</option>
+                <option>2 BHK</option>
+                <option>3 BHK</option>
+              </select>
             </div>
           </div>
         </div>
-      )}
+
+        {/* Centered Listings */}
+        <div className="flex-1 space-y-12 pb-6 md:ml-10 mx-auto max-w-4xl">
+          {filteredListings.map((listing, index) => (
+            <div
+              key={listing.id}
+              className="relative bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e] max-w-lg mx-auto"
+            >
+              {/* Listing content unchanged */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl text-pink-200 font-semibold">
+                    {listing.name}
+                  </h2>
+                  <p className="text-sm text-pink-100">
+                    <a
+                      href={listing.mapLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-blue-300 mt-1 hover:underline"
+                    >
+                      <FaMapMarkerAlt className="mr-2" />
+                      {listing.location}, {listing.city}
+                    </a>
+                  </p>
+                </div>
+                <div className="text-green-400 text-lg font-bold">
+                  {listing.rent}
+                </div>
+              </div>
+
+              <div className="relative mt-4">
+                <img
+                  src={listing.images[imageIndexes[index] ?? 0]}
+                  alt="property"
+                  className="w-full h-56 object-cover rounded-lg"
+                />
+                <button
+                  onClick={() =>
+                    handleImageChange(index, -1, listing.images.length)
+                  }
+                  className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() =>
+                    handleImageChange(index, 1, listing.images.length)
+                  }
+                  className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                >
+                  ›
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
+                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                  <FaHome /> {listing.bhk}
+                </div>
+                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                  <FaCouch /> {listing.furnishing}
+                </div>
+                {listing.ac && (
+                  <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                    <FaSnowflake /> AC
+                  </div>
+                )}
+                {listing.terrace && (
+                  <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                    <FaTree /> Terrace
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center mt-6">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setPopupType("message");
+                      setActivePopup(index);
+                    }}
+                    className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
+                  >
+                    Message
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPopupType("contact");
+                      setActivePopup(index);
+                    }}
+                    className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
+                  >
+                    Contact
+                  </button>
+                </div>
+                <div className="flex gap-4">
+                  <a
+                    href="https://wa.me/1234567890"
+                    target="_blank"
+                    className="bg-green-500 p-3 rounded-full"
+                  >
+                    <FaWhatsapp />
+                  </a>
+                  <a
+                    href="https://t.me/yourtelegramusername"
+                    target="_blank"
+                    className="bg-blue-500 p-3 rounded-full"
+                  >
+                    <FaTelegram />
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  );
+   );
 };
 
 export default Listings;
