@@ -1,5 +1,5 @@
 // src/components/Listings.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     FaWhatsapp,
     FaTelegram,
@@ -407,7 +407,7 @@ const Listings = () => {
                                     className="absolute top-1/2 left-2 transform -translate-y--1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
                                 >
                                     ‹
-                                </button>
+                                    </button>
                                 <button
                                     onClick={() =>
                                         handleImageChange(index, 1, listing.images.length)
@@ -462,6 +462,7 @@ const Listings = () => {
                                     <a
                                         href="https://wa.me/1234567890"
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="bg-green-500 p-3 rounded-full"
                                     >
                                         <FaWhatsapp />
@@ -469,6 +470,7 @@ const Listings = () => {
                                     <a
                                         href="https://t.me/yourtelegramusername"
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="bg-blue-500 p-3 rounded-full"
                                     >
                                         <FaTelegram />
