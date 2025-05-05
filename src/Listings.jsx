@@ -28,6 +28,30 @@ const Listings = () => {
         tenantPreference: "",
     });
 
+    const listingsContainerRef = useRef(null);
+
+    const handleWheelScroll = (event) => {
+        if (event.deltaY !== 0) {
+            event.preventDefault(); // Prevent vertical scrolling
+            if (listingsContainerRef.current) {
+                listingsContainerRef.current.scrollLeft += event.deltaY * 2; // Adjust scroll speed as needed
+            }
+        }
+    };
+
+    useEffect(() => {
+        const container = listingsContainerRef.current;
+        if (container) {
+            container.addEventListener('wheel', handleWheelScroll, { passive: false });
+        }
+
+        return () => {
+            if (container) {
+                container.removeEventListener('wheel', handleWheelScroll);
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const data = [
             {
@@ -365,7 +389,7 @@ const Listings = () => {
                 </div>
 
                 {/* Centered Listings */}
-                <div className="flex-1 space-y-12 pb-6 md:ml-10 mx-auto max-w-4xl">
+                <div className="flex-1 space-y-12 pb-6 md:ml-10 mx-auto max-w-4xl" ref={listingsContainerRef} style={{ overflowX: 'auto' }}>
                     {filteredListings.map((listing, index) => (
                         <div
                             key={listing.id}
@@ -391,135 +415,135 @@ const Listings = () => {
                                 </div>
                                 <div className="text-green-400 text-lg font-bold">
                                     {listing.rent}
-                                </div>
-                            </div>
+                                      </div>
+                                  </div>
 
-                            <div className="relative mt-4">
-                                <img
-                                    src={listing.images[imageIndexes[index] ?? 0]}
-                                    alt="property"
-                                    className="w-full h-56 object-cover rounded-lg"
-                                />
-                                <button
-                                    onClick={() =>
-                                        handleImageChange(index, -1, listing.images.length)
-                                    }
-                                    className="absolute top-1/2 left-2 transform -translate-y--1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
-                                >
-                                    ‹
-                                    </button>
-                                <button
-                                    onClick={() =>
-                                        handleImageChange(index, 1, listing.images.length)
-                                    }
-                                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
-                                >
-                                    ›
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
-                                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                    <FaHome /> {listing.bhk}
-                                </div>
-                                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                    <FaCouch /> {listing.furnishing}
-                                </div>
-                                {listing.ac && (
-                                    <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                        <FaSnowflake /> AC
-                                    </div>
-                                )}
-                                {listing.terrace && (
-                                    <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                        <FaTree /> Terrace
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex justify-between items-center mt-6">
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            setPopupType("message");
-                                            setActivePopup(index);
-                                        }}
-                                        className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
-                                    >
-                                        Message
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setPopupType("contact");
-                                            setActivePopup(index);
-                                        }}
-                                        className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
-                                    >
-                                        Contact
-                                    </button>
-                                </div>
-                                <div className="flex gap-4">
-                                    <a
-                                        href="https://wa.me/1234567890"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-green-500 p-3 rounded-full"
-                                    >
-                                        <FaWhatsapp />
-                                    </a>
-                                    <a
-                                        href="https://t.me/yourtelegramusername"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-blue-500 p-3 rounded-full"
-                                    >
-                                        <FaTelegram />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {activePopup !== null && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-white text-black rounded-xl p-6 w-11/12 max-w-md shadow-lg">
-                        <h2 className="text-xl font-semibold mb-4">
-                            {popupType === "message" ? "Send a Message" : "Contact"}
-                        </h2>
-                        <textarea
-                            value={inputs[activePopup] || ""}
-                            onChange={(e) =>
-                                setInputs({ ...inputs, [activePopup]: e.target.value })
-                            }
-                            className="w-full p-3 mb-4 border rounded"
-                            rows="3"
-                            placeholder={
-                                popupType === "message"
-                                    ? "Your message..."
-                                    : "Your contact details..."
-                            }
-                        />
-                        <div className="flex justify-end">
-                            <button
-                                className="bg-gray-300 text-black px-4 py-2 rounded mr-2 hover:bg-gray-400"
-                                onClick={() => setActivePopup(null)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                onClick={handleSend}
-                            >
-                                Send
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-export default Listings;
+                                  <div className="relative mt-4">
+                                      <img
+                                          src={listing.images[imageIndexes[index] ?? 0]}
+                                          alt="property"
+                                          className="w-full h-56 object-cover rounded-lg"
+                                      />
+                                      <button
+                                          onClick={() =>
+                                              handleImageChange(index, -1, listing.images.length)
+                                          }
+                                          className="absolute top-1/2 left-2 transform -translate-y--1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                                      >
+                                          ‹
+                                      </button>
+                                      <button
+                                          onClick={() =>
+                                              handleImageChange(index, 1, listing.images.length)
+                                          }
+                                          className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                                      >
+                                          ›
+                                      </button>
+                                  </div>
+  
+                                  <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
+                                      <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                          <FaHome /> {listing.bhk}
+                                      </div>
+                                      <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                          <FaCouch /> {listing.furnishing}
+                                      </div>
+                                      {listing.ac && (
+                                          <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                              <FaSnowflake /> AC
+                                          </div>
+                                      )}
+                                      {listing.terrace && (
+                                          <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                              <FaTree /> Terrace
+                                          </div>
+                                      )}
+                                  </div>
+  
+                                  <div className="flex justify-between items-center mt-6">
+                                      <div className="flex gap-2">
+                                          <button
+                                              onClick={() => {
+                                                  setPopupType("message");
+                                                  setActivePopup(index);
+                                              }}
+                                              className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
+                                          >
+                                              Message
+                                          </button>
+                                          <button
+                                              onClick={() => {
+                                                  setPopupType("contact");
+                                                  setActivePopup(index);
+                                              }}
+                                              className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
+                                          >
+                                              Contact
+                                          </button>
+                                      </div>
+                                      <div className="flex gap-4">
+                                          <a
+                                              href="https://wa.me/1234567890"
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="bg-green-500 p-3 rounded-full"
+                                          >
+                                              <FaWhatsapp />
+                                          </a>
+                                          <a
+                                              href="https://t.me/yourtelegramusername"
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="bg-blue-500 p-3 rounded-full"
+                                          >
+                                              <FaTelegram />
+                                          </a>
+                                      </div>
+                                  </div>
+                              </div>
+                          ))}
+                  </div>
+              </div>
+  
+              {activePopup !== null && (
+                  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                      <div className="bg-white text-black rounded-xl p-6 w-11/12 max-w-md shadow-lg">
+                          <h2 className="text-xl font-semibold mb-4">
+                              {popupType === "message" ? "Send a Message" : "Contact"}
+                          </h2>
+                          <textarea
+                              value={inputs[activePopup] || ""}
+                              onChange={(e) =>
+                                  setInputs({ ...inputs, [activePopup]: e.target.value })
+                              }
+                              className="w-full p-3 mb-4 border rounded"
+                              rows="3"
+                              placeholder={
+                                  popupType === "message"
+                                      ? "Your message..."
+                                      : "Your contact details..."
+                              }
+                          />
+                          <div className="flex justify-end">
+                              <button
+                                  className="bg-gray-300 text-black px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                                  onClick={() => setActivePopup(null)}
+                              >
+                                  Cancel
+                              </button>
+                              <button
+                                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                  onClick={handleSend}
+                              >
+                                  Send
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              )}
+          </div>
+      );
+  };
+  
+  export default Listings;
