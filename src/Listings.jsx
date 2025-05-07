@@ -29,12 +29,13 @@ const Listings = () => {
     });
 
     const listingsContainerRef = useRef(null);
+    const listingRefs = useRef([]); // Ref to hold individual listing card elements for image scrolling
 
     const handleWheelScroll = (event) => {
         if (event.deltaY !== 0) {
             event.preventDefault(); // Prevent vertical scrolling
             if (listingsContainerRef.current) {
-                listingsContainerRef.current.scrollLeft += event.deltaY * 2; // Adjust scroll speed as needed
+                listingsContainerRef.current.scrollLeft += event.deltaY * 2;
             }
         }
     };
@@ -197,16 +198,44 @@ const Listings = () => {
                     const nextIndex = (currentIndex + 1) % listing.images.length;
                     return { ...prevIndexes, [index]: nextIndex };
                 });
-            }, 3000); // Change image every 3 seconds
+            }, 3000);
 
             intervalIds[index] = intervalId;
         });
 
-        // Cleanup function to clear intervals when the component unmounts or filteredListings change
         return () => {
             Object.values(intervalIds).forEach(clearInterval);
         };
     }, [filteredListings]);
+
+    // *****************************************************************************************
+    // New useEffect for image scrolling within listings
+    useEffect(() => {
+        listingRefs.current = listingRefs.current.slice(0, filteredListings.length);
+
+        listingRefs.current.forEach((listingElement, index) => {
+            if (listingElement && listingElement.querySelector('.listing-image-container')) {
+                const imageContainer = listingElement.querySelector('.listing-image-container');
+
+                const handleImageWheelScroll = (event) => {
+                    event.preventDefault();
+                    const delta = Math.sign(event.deltaY);
+                    setImageIndexes((prevIndexes) => {
+                        const currentIndex = prevIndexes[index] || 0;
+                        const nextIndex = (currentIndex - delta + filteredListings[index].images.length) % filteredListings[index].images.length;
+                        return { ...prevIndexes, [index]: nextIndex };
+                    });
+                };
+
+                imageContainer.addEventListener('wheel', handleImageWheelScroll, { passive: false });
+
+                return () => {
+                    imageContainer.removeEventListener('wheel', handleImageWheelScroll);
+                };
+            }
+        });
+    }, [filteredListings]);
+    // *****************************************************************************************
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -329,7 +358,7 @@ const Listings = () => {
                                 <option>1 BHK</option>
                                 <option>2 BHK</option>
                                 <option>3 BHK</option>
-                                <option>Studio</option> {/* Added Studio option */}
+                                <option>Studio</option>
                             </select>
                         </div>
 
@@ -394,6 +423,7 @@ const Listings = () => {
                         <div
                             key={listing.id}
                             className="relative bg-gradient-to-br from-[#2c1a4f] to-[#382d67] p-6 rounded-2xl shadow-lg border border-[#422c6e] max-w-lg mx-auto"
+                            ref={(el) => (listingRefs.current[index] = el)} // Attach ref for image scrolling
                         >
                             {/* Listing content unchanged */}
                             <div className="flex justify-between items-start">
@@ -415,135 +445,135 @@ const Listings = () => {
                                 </div>
                                 <div className="text-green-400 text-lg font-bold">
                                     {listing.rent}
-                                      </div>
-                                  </div>
+                                </div>
+                            </div>
 
-                                  <div className="relative mt-4">
-                                      <img
-                                          src={listing.images[imageIndexes[index] ?? 0]}
-                                          alt="property"
-                                          className="w-full h-56 object-cover rounded-lg"
-                                      />
-                                      <button
-                                          onClick={() =>
-                                              handleImageChange(index, -1, listing.images.length)
-                                          }
-                                          className="absolute top-1/2 left-2 transform -translate-y--1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
-                                      >
-                                          ‹
-                                      </button>
-                                      <button
-                                          onClick={() =>
-                                              handleImageChange(index, 1, listing.images.length)
-                                          }
-                                          className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
-                                      >
-                                          ›
-                                      </button>
-                                  </div>
-  
-                                  <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
-                                      <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                          <FaHome /> {listing.bhk}
-                                      </div>
-                                      <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                          <FaCouch /> {listing.furnishing}
-                                      </div>
-                                      {listing.ac && (
-                                          <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                              <FaSnowflake /> AC
-                                          </div>
-                                      )}
-                                      {listing.terrace && (
-                                          <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
-                                              <FaTree /> Terrace
-                                          </div>
-                                      )}
-                                  </div>
-  
-                                  <div className="flex justify-between items-center mt-6">
-                                      <div className="flex gap-2">
-                                          <button
-                                              onClick={() => {
-                                                  setPopupType("message");
-                                                  setActivePopup(index);
-                                              }}
-                                              className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
-                                          >
-                                              Message
-                                          </button>
-                                          <button
-                                              onClick={() => {
-                                                  setPopupType("contact");
-                                                  setActivePopup(index);
-                                              }}
-                                              className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
-                                          >
-                                              Contact
-                                          </button>
-                                      </div>
-                                      <div className="flex gap-4">
-                                          <a
-                                              href="https://wa.me/1234567890"
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="bg-green-500 p-3 rounded-full"
-                                          >
-                                              <FaWhatsapp />
-                                          </a>
-                                          <a
-                                              href="https://t.me/yourtelegramusername"
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="bg-blue-500 p-3 rounded-full"
-                                          >
-                                              <FaTelegram />
-                                          </a>
-                                      </div>
-                                  </div>
-                              </div>
-                          ))}
-                  </div>
-              </div>
-  
-              {activePopup !== null && (
-                  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                      <div className="bg-white text-black rounded-xl p-6 w-11/12 max-w-md shadow-lg">
-                          <h2 className="text-xl font-semibold mb-4">
-                              {popupType === "message" ? "Send a Message" : "Contact"}
-                          </h2>
-                          <textarea
-                              value={inputs[activePopup] || ""}
-                              onChange={(e) =>
-                                  setInputs({ ...inputs, [activePopup]: e.target.value })
-                              }
-                              className="w-full p-3 mb-4 border rounded"
-                              rows="3"
-                              placeholder={
-                                  popupType === "message"
-                                      ? "Your message..."
-                                      : "Your contact details..."
-                              }
-                          />
-                          <div className="flex justify-end">
-                              <button
-                                  className="bg-gray-300 text-black px-4 py-2 rounded mr-2 hover:bg-gray-400"
-                                  onClick={() => setActivePopup(null)}
-                              >
-                                  Cancel
-                              </button>
-                              <button
-                                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                  onClick={handleSend}
-                              >
-                                  Send
-                              </button>
-                          </div>
-                      </div>
-                  </div>
-              )}
-          </div>
-      );
-  };
-  
-  export default Listings;
+                            <div className="relative mt-4 listing-image-container"> {/* Added class here */}
+                                <img
+                                    src={listing.images[imageIndexes[index] ?? 0]}
+                                    alt="property"
+                                    className="w-full h-56 object-cover rounded-lg"
+                                />
+                                <button
+                                    onClick={() =>
+                                        handleImageChange(index, -1, listing.images.length)
+                                    }
+                                    className="absolute top-1/2 left-2 transform -translate-y--1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                                >
+                                    ‹
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        handleImageChange(index, 1, listing.images.length)
+                                    }
+                                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
+                                >
+                                    ›
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
+                                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                    <FaHome /> {listing.bhk}
+                                </div>
+                                <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                    <FaCouch /> {listing.furnishing}
+                                </div>
+                                {listing.ac && (
+                                    <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                        <FaSnowflake /> AC
+                                    </div>
+                                )}
+                                {listing.terrace && (
+                                    <div className="bg-white/10 rounded p-2 flex items-center gap-2 text-pink-100">
+                                        <FaTree /> Terrace
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex justify-between items-center mt-6">
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setPopupType("message");
+                                            setActivePopup(index);
+                                        }}
+                                        className="bg-white text-black px-4 py-2 text-sm rounded hover:bg-gray-200"
+                                    >
+                                        Message
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setPopupType("contact");
+                                            setActivePopup(index);
+                                        }}
+                                        className="bg-[#5ecbff] px-4 py-2 text-sm rounded text-white hover:bg-[#3fbfff]"
+                                    >
+                                        Contact
+                                    </button>
+                                </div>
+                                <div className="flex gap-4">
+                                    <a
+                                        href="https://wa.me/1234567890"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-green-500 p-3 rounded-full"
+                                    >
+                                        <FaWhatsapp />
+                                    </a>
+                                    <a
+                                        href="https://t.me/yourtelegramusername"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-blue-500 p-3 rounded-full"
+                                    >
+                                        <FaTelegram />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {activePopup !== null && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                    <div className="bg-white text-black rounded-xl p-6 w-11/12 max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">
+                            {popupType === "message" ? "Send a Message" : "Contact"}
+                        </h2>
+                        <textarea
+                            value={inputs[activePopup] || ""}
+                            onChange={(e) =>
+                                setInputs({ ...inputs, [activePopup]: e.target.value })
+                            }
+                            className="w-full p-3 mb-4 border rounded"
+                            rows="3"
+                            placeholder={
+                                popupType === "message"
+                                    ? "Your message..."
+                                    : "Your contact details..."
+                            }
+                        />
+                        <div className="flex justify-end">
+                            <button
+                                className="bg-gray-300 text-black px-4 py-2 rounded mr-2 hover:bg-gray-400"
+                                onClick={() => setActivePopup(null)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                onClick={handleSend}
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Listings;
